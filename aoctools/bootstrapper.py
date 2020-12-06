@@ -1,6 +1,9 @@
 """Tools for generating the AOC problem directory"""
 
 from pathlib import Path
+from typing import Optional
+
+import aoctools.common as aoc_common
 
 _MAKEFILE = """
 .PHONY: lint
@@ -149,3 +152,36 @@ def make_day(root_path: str, day: int):
 
     with open(test_file_path, 'w', encoding='utf8') as test_file:
         test_file.write(_PROBLEM_TEST.format(day))
+
+
+def make_example(root_path: str, day: int, part: int, expected: str,
+                 index: Optional[int]):
+    """
+    Adds an example to a given day
+
+    Parameters
+    ----------
+    root_path
+        The path of the root AOC problem directory
+    day:
+        The AOC problem day, e.g., 1, 2, ... 25
+    part:
+        The problem part, i.e., 1 or 2
+    expected:
+        The expected value
+    index:
+        The index of the example; one higher than the previous example, if not
+        given explicitly
+    """
+
+    if index is None:
+        examples = aoc_common.get_examples_sorted(root_path, day)
+        index = examples[-1][0]+1 if examples else 1
+
+    example_path = Path(root_path).joinpath('data', f"d{day:02d}",
+                                            f"example_{index:02d}.txt")
+
+    with open(example_path, 'w', encoding='utf8') as example_file:
+        example_file.write(f"part: {part}\n")
+        example_file.write(f"expected: {expected}\n")
+        example_file.write('\n')

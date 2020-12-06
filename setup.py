@@ -3,17 +3,17 @@
 import setuptools
 
 with open('README.md', 'r') as fh:
-    long_description = fh.read()
+    LONG_DESCRIPTION = fh.read()
 
 setuptools.setup(
     name='aoctools',
     author='Kelly Littlepage',
     author_email='kelly@klittlepage.com',
     description='A CLI for working with Advent of Code (AOC) problems',
-    long_description=long_description,
+    long_description=LONG_DESCRIPTION,
     long_description_content_type='text/markdown',
     url='https://github.com/klittlepage/aoctools',
-    download_url='https://github.com/klittlepage/aoctools/archive/0.1.0.tar.gz',
+    download_url='https://github.com/klittlepage/aoctools/archive/0.2.0.tar.gz',
     packages=setuptools.find_packages(),
     classifiers=[
         'Programming Language :: Python :: 3',

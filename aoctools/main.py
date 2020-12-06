@@ -93,6 +93,29 @@ def _build_init_day(subparsers):
     init_cmd.set_defaults(func=_exec_init_day)
 
 
+def _build_init_example(subparsers):
+    def _exec_init_example(args):
+        bootstrapper.make_example(args.root_path,
+                                  args.day,
+                                  args.part,
+                                  args.expected,
+                                  args.example_number)
+    init_cmd = subparsers.add_parser('init_example',
+                                     help='initialize a new example')
+    init_cmd.add_argument('--root-path', nargs='?', default=os.getcwd(),
+                          help='the root project directory; defaults to the '
+                               'current working directory')
+    init_cmd.add_argument('day', type=_valid_day,
+                          help='aoc challenge day')
+    init_cmd.add_argument('part', type=int, choices=[1, 2],
+                          help='the challenge part for the example')
+    init_cmd.add_argument('expected', type=str,
+                          help='the expected example value')
+    init_cmd.add_argument('example_number', type=int, nargs='?', default=None,
+                          help='aoc challenge day; optional (autoincrement)')
+    init_cmd.set_defaults(func=_exec_init_example)
+
+
 def _build_runner(subparsers):
     def _run(args):
         sys.path.append(args.root_path)
@@ -111,6 +134,26 @@ def _build_runner(subparsers):
     run_cmd.set_defaults(func=_run)
 
 
+def _build_example_runner(subparsers):
+    def _run_example(args):
+        sys.path.append(args.root_path)
+        runner.run_example(args.root_path, args.day, args.debug,
+                           args.example_number)
+
+    run_cmd = subparsers.add_parser('run_examples',
+                                    help='runs examples for a challenge '
+                                         'problem')
+    run_cmd.add_argument('--root-path', nargs='?', default=os.getcwd(),
+                         help='the root project directory')
+    run_cmd.add_argument('--debug', help='print debug info', default=False,
+                         action='store_true')
+
+    run_cmd.add_argument('day', type=_valid_day, help='aoc challenge day')
+    run_cmd.add_argument('example_number', type=int, nargs='?', default=None,
+                         help='the example to run; defaults to all examples')
+    run_cmd.set_defaults(func=_run_example)
+
+
 def main():
     """
     The main entrypoint of the CLI
@@ -127,7 +170,9 @@ def main():
 
     _build_init(subparsers)
     _build_init_day(subparsers)
+    _build_init_example(subparsers)
     _build_runner(subparsers)
+    _build_example_runner(subparsers)
 
     args = parser.parse_args()
     args.func(args)

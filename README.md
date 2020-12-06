@@ -116,7 +116,68 @@ def p_1(input_file: IO, debug=False):
     return v_1 + v_2
 ```
 
-### Step 4: Run your solution
+### Step 4: Test the example inputs
+
+Create a new example by running the `init_example` command:
+
+```text
+usage: aoctools init_example [-h] [--root-path [ROOT_PATH]]
+                             day {1,2} expected [example_number]
+
+positional arguments:
+  day                   aoc challenge day
+  {1,2}                 the challenge part for the example
+  expected              the expected example value
+  example_number        aoc challenge day; optional (autoincrement)
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --root-path [ROOT_PATH]
+                        the root project directory; defaults to the current
+                        working directory
+```
+
+Examples are created in `data/day/example_n.txt`. By default, your examples will
+be numbered sequentially; you can specify a number explicitly by passing an
+additional `[example_number]` argument.
+
+Example files take the form:
+
+```text
+part: 1
+expected: 2
+
+1-3 a: abcde
+1-3 b: cdefg
+2-9 c: ccccccccc
+```
+
+The first line must be `part: (1|2)` corresponding to the part of the AOC
+problem that the example pertains to. The second line must be an expected
+value: `expected: (.+)`. The third line must be blank line. The rest of the file
+should contain the example text.
+
+Run examples via the `run_examples` command:
+
+```text
+usage: aoctools run_examples [-h] [--root-path [ROOT_PATH]] [--debug]
+                             day [example_number]
+
+positional arguments:
+  day                   aoc challenge day
+  example_number        the example to run; defaults to all examples
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --root-path [ROOT_PATH]
+                        the root project directory
+  --debug               print debug info
+```
+
+You must specify a day. You can optionally specify a specific example to run;
+by default, all examples for the given day will run.
+
+### Step 5: Run your solution
 
 ```text
 usage: aoctools run [-h] [--root-path [ROOT_PATH]] [--debug] day {1,2}
@@ -141,7 +202,7 @@ aoctools run 1 1
 solution to day 1, part 1: xxxx
 ```
 
-### Step 5 (Optional): Regression tests & Code Quality
+### Step 6 (Optional): Regression tests & Code Quality
 
 Once you identify a solution you can populate the automatically generated
 regression tests under `tests/aoc/test_d*`:
