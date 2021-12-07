@@ -6,37 +6,74 @@ from typing import Optional
 import aoctools.common as aoc_common
 
 _MAKEFILE = """
+.PHONY: format
+format:
+	poetry run autopep8 -i -r aoc tests
+
 .PHONY: lint
 lint:
-	pylint aoc tests
-	mypy aoc tests
+	poetry run flake8 aoc tests
+	poetry run mypy aoc tests
 
 .PHONY: test
 test:
-	python3 -m unittest discover
-
+	poetry run pytest
 """.lstrip()
 
-_REQUIREMENTS_DEV = """
-mypy
-pylint
-autopep8
+_PYPROJECT = """
+[tool.poetry]
+name = "{name}"
+version = "0.1.0"
+description = "AOC {name}"
+authors = ["AOC Author <email@example.com"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+aoctools = {{ git = "https://github.com/klittlepage/aoctools.git" }}
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
+black = "*"
+autopep8 = "*"
+flake8 = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+""".lstrip()
+
+_MYPY = """
+[mypy]
+check_untyped_defs = True
+disallow_untyped_defs = True
+disallow_incomplete_defs = True
+disallow_untyped_decorators = True
+disallow_any_unimported = True
+warn_return_any = True
+warn_unused_ignores = True
+no_implicit_optional = True
+show_error_codes = True
+"""
+
+_FLAKE8 = """
+[flake8]
+max-line-length = 88
+extend-ignore = E203
 """.lstrip()
 
 _PROBLEM_INIT = """
-from aoc.{0}.main import p_1, p_2
+from aoc.{0}.main import p_1, p_2  # noqa: F401
 """.lstrip()
 
 _PROBLEM_MAIN = """
-from typing import IO
+from typing import Any, IO
 
-def p_1(input_file: IO,
-        debug=False): # pylint: disable=unused-argument
+
+def p_1(input_file: IO, debug: bool = False) -> Any:
     pass
 
 
-def p_2(input_file: IO,
-        debug=False): # pylint: disable=unused-argument
+def p_2(input_file: IO, debug: bool = False) -> Any:
     pass
 """.lstrip()
 
@@ -47,10 +84,10 @@ from tests.aoc.test_base import BaseTestCase
 
 
 class TestAll(BaseTestCase):
-    def test_part_one(self):
+    def test_part_one(self) -> None:
         self.run_aoc_part({0}, False, aoc.d{0:02d}.p_1)
 
-    def test_part_two(self):
+    def test_part_two(self) -> None:
         self.run_aoc_part({0}, False, aoc.d{0:02d}.p_2)
 """.lstrip()
 
@@ -58,17 +95,19 @@ _TEST_RUNNER = """
 import unittest
 import os
 
+from typing import Any, Callable, TextIO
+
 
 class BaseTestCase(unittest.TestCase):
     @staticmethod
-    def get_path(day):
+    def get_path(day: int) -> str:
         cur_path = os.path.dirname(os.path.realpath(__file__))
-        return os.path.join(cur_path, '../../', 'data', f"d{day:02d}",
-                            'input.txt')
+        return os.path.join(cur_path, "../../", "data", f"d{day:02d}", "input.txt")
 
-    def run_aoc_part(self, day, expected, method):
-        with open(BaseTestCase.get_path(day), 'r',
-                  encoding='utf8') as input_file:
+    def run_aoc_part(
+        self, day: int, expected: Any, method: Callable[[TextIO], Any]
+    ) -> None:
+        with open(BaseTestCase.get_path(day), "r", encoding="utf8") as input_file:
             self.assertEqual(expected, method(input_file))
 """.lstrip()
 
@@ -96,9 +135,16 @@ def init(root_path: str, year: int):
     with open(root_dir.joinpath('Makefile'), 'w', encoding='utf8') as makefile:
         makefile.write(_MAKEFILE)
 
-    with open(root_dir.joinpath('requirements-dev.txt'),
-              'w', encoding='utf8') as requirements_dev:
-        requirements_dev.write(_REQUIREMENTS_DEV)
+    with open(root_dir.joinpath('pyproject.toml'), 'w', encoding='utf8') as py_project:
+        py_project.write(_PYPROJECT.format(name=year))
+
+    with open(root_dir.joinpath('mypy.ini'),
+              'w', encoding='utf8') as mypy:
+        mypy.write(_MYPY)
+
+    with open(root_dir.joinpath('.flake8'),
+              'w', encoding='utf8') as flake8:
+        flake8.write(_FLAKE8)
 
     module_dir = root_dir.joinpath('aoc')
     module_dir.mkdir(parents=True)

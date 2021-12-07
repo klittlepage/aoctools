@@ -23,7 +23,10 @@ positional arguments:
 ```
 
 The `init` command will create an `aoctools` project at the path that you
-specify.
+specify. Generated projects use [poetry](https://python-poetry.org/) for package
+management. Poetry relies on a `pyproject.toml` file for configuration settings.
+You can optionally edit the generated file to configure an author name or to
+rely on a specific version of `aoctools`.
 
 ### Step 2: Bootstrap the boilerplate for a new day
 
